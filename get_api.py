@@ -1,11 +1,16 @@
 import httpx
 import os
 import time
+import logging
 from dotenv import load_dotenv
 import polars as pl
 
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO,
+                    format = '%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt = '%Y-%m-%d %H:%M:%S'
+                    )
 param = {'api_key': os.getenv('API_KEY'),
          'start_date' : '2026-09-04',
          'end_date' : '2026-09-11',
@@ -27,7 +32,7 @@ def call_api():
                 response.raise_for_status()
 
             except (httpx.HTTPStatusError, httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
-                print(f'{e} new attempt in 5 seconds ....')
+                logging.exception('%s new attempt in 5 seconds ....',e)
                 time.sleep(5)
                 continue
 
@@ -65,26 +70,26 @@ def call_api():
             if link:
                 url = link
                 final_params = None
-                print(f"Moving to next url: {url}")
+                logging.info("Moving to next url: %s",url)
                 i += 1
-                print(i)
+                logging.info('%s',i)
                 time.sleep(1.5)
             else:
-                print("All pages have been successfully processed!")
+                logging.debug("All pages have been successfully processed!")
                 break
 
             if i >= total_pages:
-                print('all pages have been processed!')
+                logging.debug('all pages have been processed!')
                 break
 
         if list_api:
-            print('writing to file')
+            logging.info('writing to file')
             df_total = pl.concat(list_api, how='vertical')
             df_total.write_parquet("NASA.parquet")
-            print('file written successfully')
+            logging.info('file written successfully')
 
         else:
-            print('something went wrong sir')
+            logging.error('something went wrong sir')
 
 call_api()
 
