@@ -10,7 +10,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO,
                     filename='application.log',
                     filemode='w',
-                    format = '%(asctime)s - %(levelname)s - %(message)s',
+                    format = '%(asctime)s - %(levelname)s ',
                     datefmt = '%Y-%m-%d %H:%M:%S'
                     )
 param = {'api_key': os.getenv('API_KEY'),
@@ -26,7 +26,7 @@ def call_api():
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 10
+        total_pages = 2
 
         while True:
             try:
@@ -92,7 +92,3 @@ def call_api():
 
         else:
             logging.error('something went wrong sir')
-
-call_api()
-
-# add prefect
