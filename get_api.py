@@ -9,7 +9,7 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO,
                     filename='application.log',
-                    filemode='a',
+                    filemode='w',
                     format = '%(asctime)s - %(levelname)s - %(message)s',
                     datefmt = '%Y-%m-%d %H:%M:%S'
                     )
@@ -26,7 +26,7 @@ def call_api():
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 2
+        total_pages = 10
 
         while True:
             try:

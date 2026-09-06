@@ -12,8 +12,7 @@ sql_query = """
     is_potentially_hazardous_asteroid Boolean , kilometers_per_second Float , 
     kilometers_per_hour Float , miles_per_hour Float , astronomical Float , lunar Float ,
     kilometers Float , miles Float , orbiting_body VARCHAR(100), is_sentry_object Boolean );
-    
-    TRUNCATE TABLE NASA_DATA;"""
+    """
 
 def conn_snow():
     with sf.connect(user=os.getenv('USER'),password=os.getenv('PASSWORD'),
@@ -26,6 +25,9 @@ def conn_snow():
 
             logging.info('creating table...')
             cursor.execute(sql_query)
+
+            logging.info("truncation of the table...")
+            cursor.execute("TRUNCATE TABLE NASA_DATA;")
 
             logging.info('putting step...')
             cursor.execute("PUT file://D:/ETL/NASA.parquet @PENDING_DATA OVERWRITE = TRUE ")
