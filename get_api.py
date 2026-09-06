@@ -8,6 +8,8 @@ import polars as pl
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO,
+                    filename='application.log',
+                    filemode='a',
                     format = '%(asctime)s - %(levelname)s - %(message)s',
                     datefmt = '%Y-%m-%d %H:%M:%S'
                     )
@@ -72,14 +74,14 @@ def call_api():
                 final_params = None
                 logging.info("Moving to next url: %s",url)
                 i += 1
-                logging.info('%s',i)
+                logging.info('the value of I became: %s',i)
                 time.sleep(1.5)
             else:
-                logging.debug("All pages have been successfully processed!")
+                logging.info("All pages have been successfully processed!")
                 break
 
             if i >= total_pages:
-                logging.debug('all pages have been processed!')
+                logging.info('all pages have been processed!')
                 break
 
         if list_api:
@@ -93,4 +95,4 @@ def call_api():
 
 call_api()
 
-# add logging and prefect
+# add prefect
