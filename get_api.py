@@ -26,7 +26,7 @@ def call_api():
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 10000
+        total_pages = 2
 
         while True:
             try:
@@ -72,7 +72,7 @@ def call_api():
             if link:
                 url = link
                 final_params = None
-                logging.info("Moving to next url: %s",url)
+                logging.info("Moving to next url")
                 i += 1
                 logging.info('the value of I became: %s',i)
                 time.sleep(1.5)

@@ -15,22 +15,23 @@ sql_query = """
     
     TRUNCATE TABLE NASA_DATA;"""
 
-with sf.connect(user=os.getenv('USER'),password=os.getenv('PASSWORD'),
+def conn_snow():
+    with sf.connect(user=os.getenv('USER'),password=os.getenv('PASSWORD'),
                 account=os.getenv('ACCOUNT'),database=os.getenv('DATABASE'),
                 schema=os.getenv('SCHEMA'),warehouse=os.getenv('WAREHOUSE')) as conn:
-    with conn.cursor() as cursor:
+        with conn.cursor() as cursor:
 
-        cursor.execute("  USE DATABASE SAMSON_STUFF; ")
-        cursor.execute("  USE SCHEMA WORK; ")
+            cursor.execute("  USE DATABASE SAMSON_STUFF; ")
+            cursor.execute("  USE SCHEMA WORK; ")
 
-        logging.info('creating table...')
-        cursor.execute(sql_query)
+            logging.info('creating table...')
+            cursor.execute(sql_query)
 
-        logging.info('putting step...')
-        cursor.execute("PUT file://D:/ETL/NASA.parquet @PENDING_DATA OVERWRITE = TRUE ")
+            logging.info('putting step...')
+            cursor.execute("PUT file://D:/ETL/NASA.parquet @PENDING_DATA OVERWRITE = TRUE ")
 
-        logging.info('copping step...')
-        cursor.execute("""
+            logging.info('copping step...')
+            cursor.execute("""
                         COPY INTO NASA_DATA
                         FROM @PENDING_DATA/NASA.parquet
                         FILE_FORMAT = (TYPE = PARQUET)
