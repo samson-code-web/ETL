@@ -1,4 +1,5 @@
 import os
+import logging
 import snowflake.connector as sf
 from dotenv import load_dotenv
 
@@ -22,14 +23,13 @@ with sf.connect(user=os.getenv('USER'),password=os.getenv('PASSWORD'),
         cursor.execute("  USE DATABASE SAMSON_STUFF; ")
         cursor.execute("  USE SCHEMA WORK; ")
 
-        print('creating table...')
-
+        logging.info('creating table...')
         cursor.execute(sql_query)
 
-        print('putting step...')
+        logging.info('putting step...')
         cursor.execute("PUT file://D:/ETL/NASA.parquet @PENDING_DATA OVERWRITE = TRUE ")
 
-        print('copping step...')
+        logging.info('copping step...')
         cursor.execute("""
                         COPY INTO NASA_DATA
                         FROM @PENDING_DATA/NASA.parquet
