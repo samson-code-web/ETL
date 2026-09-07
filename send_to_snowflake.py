@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+logger = logging.getLogger('etl.send_to_snowflake')
+
 sql_query = """ 
     CREATE TABLE IF NOT EXISTS NASA_DATA(id Int, name VARCHAR(100) , nasa_jpl_url VARCHAR(100) , nasa_date DATE , 
     absolute_magnitude_h Float, km_min Float , km_max Float , m_min Float , m_max Float , 
@@ -23,16 +25,16 @@ def conn_snow():
             cursor.execute("  USE DATABASE SAMSON_STUFF; ")
             cursor.execute("  USE SCHEMA WORK; ")
 
-            logging.info('creating table...')
+            logger.info('creating table...')
             cursor.execute(sql_query)
 
-            logging.info("truncation of the table...")
+            logger.info("truncation of the table...")
             cursor.execute("TRUNCATE TABLE NASA_DATA;")
 
-            logging.info('putting step...')
+            logger.info('putting step...')
             cursor.execute("PUT file://D:/ETL/NASA.parquet @PENDING_DATA OVERWRITE = TRUE ")
 
-            logging.info('copping step...')
+            logger.info('copping step...')
             cursor.execute("""
                         COPY INTO NASA_DATA
                         FROM @PENDING_DATA/NASA.parquet

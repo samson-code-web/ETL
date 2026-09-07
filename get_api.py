@@ -2,21 +2,13 @@ import httpx
 import os
 import time
 import logging
-from pathlib import Path
 from dotenv import load_dotenv
 import polars as pl
 
 load_dotenv()
 
-file_path = Path(__file__).resolve().parent
-qwerty = file_path / 'app.log'
+logger = logging.getLogger("etl.get_api")
 
-logging.basicConfig(level=logging.INFO,
-                    filename=str(qwerty),
-                    filemode='w',
-                    format = '%(asctime)s - %(levelname)s - %(message)s ',
-                    datefmt = '%Y-%m-%d %H:%M:%S'
-                    )
 param = {'api_key': os.getenv('API_KEY'),
          'start_date' : '2026-09-04',
          'end_date' : '2026-09-11',
@@ -30,7 +22,7 @@ def call_api():
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 2
+        total_pages = 3
 
         while True:
             try:
@@ -38,7 +30,7 @@ def call_api():
                 response.raise_for_status()
 
             except (httpx.HTTPStatusError, httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
-                logging.exception('%s new attempt in 5 seconds ....',e)
+                logger.exception('%s new attempt in 5 seconds ....',e)
                 time.sleep(5)
                 continue
 
@@ -76,23 +68,23 @@ def call_api():
             if link:
                 url = link
                 final_params = None
-                logging.info("Moving to next url")
+                logger.info("Moving to next url")
                 i += 1
-                logging.info('the value of I became: %s',i)
+                logger.info('the value of I became: %s',i)
                 time.sleep(1.5)
             else:
-                logging.info("All pages have been successfully processed!")
+                logger.info("All pages have been successfully processed!")
                 break
 
             if i >= total_pages:
-                logging.info('all pages have been processed!')
+                logger.info('all pages have been processed!')
                 break
 
         if list_api:
-            logging.info('writing to file')
+            logger.info('writing to file')
             df_total = pl.concat(list_api, how='vertical')
             df_total.write_parquet("NASA.parquet")
-            logging.info('file written successfully')
+            logger.info('file written successfully')
 
         else:
-            logging.error('something went wrong sir')
+            logger.error('something went wrong sir')
