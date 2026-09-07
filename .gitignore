@@ -1,5 +1,5 @@
 .venv/
 .env
 .idea/
-#application.log
+application.log
 __pycache__/

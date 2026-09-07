@@ -9,6 +9,7 @@ def extract_task():
 
 @task
 def load_task():
+
     print("Envoi des données dans le stage Snowflake...")
     return conn_snow()
 
