@@ -8,10 +8,11 @@ import polars as pl
 
 load_dotenv()
 
-file_path = Path(__file__).resolve().parent / 'app.log'
+file_path = Path(__file__).resolve().parent
+qwerty = file_path / 'app.log'
 
 logging.basicConfig(level=logging.INFO,
-                    filename=str(file_path),
+                    filename=str(qwerty),
                     filemode='w',
                     format = '%(asctime)s - %(levelname)s - %(message)s ',
                     datefmt = '%Y-%m-%d %H:%M:%S'
@@ -95,4 +96,3 @@ def call_api():
 
         else:
             logging.error('something went wrong sir')
-
