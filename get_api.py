@@ -1,32 +1,24 @@
 import httpx
-import os
 import time
 import logging
-from dotenv import load_dotenv
 import polars as pl
+from pathlib import Path
 
-load_dotenv()
+logger = logging.getLogger(f"etl.{__name__}")
 
-logger = logging.getLogger("etl.get_api")
-
-param = {'api_key': os.getenv('API_KEY'),
-         'start_date' : '2026-09-04',
-         'end_date' : '2026-09-11',
-         }
-
-def call_api():
+def call_api(api_key: str, start_date: str, end_date: str) -> str:
     url = 'https://api.nasa.gov/neo/rest/v1/feed'
     time_secure = httpx.Timeout(15.0, connect=15.0)
-    final_params = param
+    parameter = {'api_key': api_key, 'start_date': start_date, 'end_date': end_date}
     list_api = []
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 3
+        total_pages = 10
 
         while True:
             try:
-                response = client.get(url=url, params=final_params, follow_redirects=True, timeout=time_secure)
+                response = client.get(url=url, params=parameter, follow_redirects=True, timeout=time_secure)
                 response.raise_for_status()
 
             except (httpx.HTTPStatusError, httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
@@ -67,11 +59,12 @@ def call_api():
 
             if link:
                 url = link
-                final_params = None
+                parameter = None
                 logger.info("Moving to next url")
                 i += 1
                 logger.info('the value of I became: %s',i)
                 time.sleep(1.5)
+
             else:
                 logger.info("All pages have been successfully processed!")
                 break
@@ -83,8 +76,10 @@ def call_api():
         if list_api:
             logger.info('writing to file')
             df_total = pl.concat(list_api, how='vertical')
-            df_total.write_parquet("NASA.parquet")
+            file_path = str(Path(__file__).resolve().parent / 'NASA.parquet')
+            df_total.write_parquet(file_path)
             logger.info('file written successfully')
-
+            return file_path
         else:
             logger.error('something went wrong sir')
+            return ''
