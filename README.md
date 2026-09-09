@@ -24,12 +24,7 @@ Ensure you have a Python virtual environment configured and the following depend
 
 ### Configuration
 The pipeline relies on Prefect Secret blocks for secure credential management. You must create the following blocks in your Prefect UI/Server before running the pipeline:
-* `api-key`: Your NASA API Key
+* `api-key`:  NASA API Key
 * `sf-user`, `sf-password`, `sf-account`: Snowflake connection credentials
 * `sf-database`, `sf-schema`, `sf-warehouse`: Snowflake environment targets
-
-### Running the Pipeline
-To execute the flow locally or on your server, simply run:
-```bash
-python main.py
 
