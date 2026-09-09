@@ -24,7 +24,7 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str:
             except (httpx.HTTPStatusError, httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
                 logger.exception('%s new attempt in 5 seconds ....',e)
                 time.sleep(5)
-                continue
+                break
 
             data = response.json()
 

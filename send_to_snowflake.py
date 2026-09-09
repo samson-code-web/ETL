@@ -18,8 +18,8 @@ def conn_snow(file_path: str , sf_user: str, sf_password: str, sf_account: str, 
                 schema=sf_schema,warehouse=sf_warehouse) as conn:
         with conn.cursor() as cursor:
 
-            cursor.execute("  USE DATABASE SAMSON_STUFF; ")
-            cursor.execute("  USE SCHEMA WORK; ")
+            cursor.execute(f"USE DATABASE {sf_database};")
+            cursor.execute(f"USE SCHEMA {sf_schema};")
 
             logger.info('creating table...')
             cursor.execute(sql_query)
