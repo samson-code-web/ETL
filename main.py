@@ -48,7 +48,5 @@ def pipeline(start_date='2022-09-04', end_date='2022-09-11'):
     if file:
         load_task(file, sf_user, sf_password, sf_account, sf_database, sf_schema, sf_warehouse)
 
-if __name__ == "__main__":
-    pipeline()
 
 
