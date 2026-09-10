@@ -14,7 +14,7 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str:
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 25000
+        total_pages = 50000
 
         while True:
             try:
