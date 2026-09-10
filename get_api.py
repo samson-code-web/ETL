@@ -6,7 +6,7 @@ from pathlib import Path
 
 logger = logging.getLogger(f"etl.{__name__}")
 
-def call_api(api_key: str, start_date: str, end_date: str) -> str:
+def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
     url = 'https://api.nasa.gov/neo/rest/v1/feed'
     time_secure = httpx.Timeout(15.0, connect=15.0)
     parameter = {'api_key': api_key, 'start_date': start_date, 'end_date': end_date}
@@ -21,10 +21,10 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str:
                 response = client.get(url=url, params=parameter, follow_redirects=True, timeout=time_secure)
                 response.raise_for_status()
 
-            except (httpx.HTTPStatusError, httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
+            except (httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
                 logger.exception('%s new attempt in 5 seconds ....',e)
                 time.sleep(5)
-                break
+                raise httpx.HTTPStatusError
 
             data = response.json()
 
@@ -82,4 +82,4 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str:
             return file_path
         else:
             logger.error('something went wrong sir')
-            return ''
+            return None

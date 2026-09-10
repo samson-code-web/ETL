@@ -19,7 +19,7 @@ push: null
 # this project in remote locations
 pull:
 - prefect.deployments.steps.set_working_directory:
-    directory: D:\ETL
+    directory: /root/ETL
 
 # the deployments section allows you to provide configuration
 # for deploying flows
@@ -33,5 +33,5 @@ deployments:
       work_queue_name: null
       job_variables: {}
     schedule:
-      cron: "10 23 * * *"
+      cron: "10 23 */3 * *"
       timezone: "America/Toronto"
