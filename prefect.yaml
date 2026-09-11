@@ -33,5 +33,5 @@ deployments:
       work_queue_name: null
       job_variables: {}
     schedule:
-      cron: "10 23 */7 * *"
+      interval: 604800
       timezone: "America/Toronto"
