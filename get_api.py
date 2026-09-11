@@ -14,17 +14,16 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 50000
+        total_pages = 100000
 
         while True:
             try:
                 response = client.get(url=url, params=parameter, follow_redirects=True, timeout=time_secure)
                 response.raise_for_status()
 
-            except (httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
-                logger.exception('%s new attempt in 5 seconds ....',e)
-                time.sleep(5)
-                raise httpx.HTTPStatusError
+            except (httpx.HTTPStatusError , httpx.RequestError , httpx.ConnectTimeout , httpx.ReadTimeout) as e:
+                logger.exception('%s an error happened ....',e)
+                raise
 
             data = response.json()
 
@@ -81,5 +80,5 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
             logger.info('file written successfully')
             return file_path
         else:
-            logger.error('something went wrong sir')
+            logger.error('something went wrong ')
             return None

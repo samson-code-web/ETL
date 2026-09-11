@@ -46,6 +46,9 @@ def pipeline(start_date='2022-09-04', end_date='2022-09-11'):
 
     if file:
         load_task(file, sf_user, sf_password, sf_account, sf_database, sf_schema, sf_warehouse)
+    else:
+        logger.info("API extraction returned no file. Aborting load step")
+        raise ValueError("Extraction failed as it returned no file. Pipeline run terminated.")
 
 
 
