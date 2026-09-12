@@ -26,14 +26,14 @@ def extract_task(api_key, start_date, end_date):
     return call_api(api_key, start_date, end_date)
 
 
-@task
+@task(retries=2, retry_delay_seconds=10)
 def load_task(file, sf_user, sf_password, sf_account, sf_database, sf_schema, sf_warehouse):
     logger.info("working on the conn_snow function...")
     return conn_snow(file, sf_user, sf_password, sf_account, sf_database, sf_schema, sf_warehouse)
 
 
 @flow(name="launching the pipeline")
-def pipeline(start_date='2022-09-04', end_date='2022-09-11'):
+def pipeline(start_date='2020-09-04', end_date='2020-09-11'):
     api_key = Secret.load("api-key").get()
     sf_user = Secret.load('sf-user').get()
     sf_password = Secret.load("sf-password").get()

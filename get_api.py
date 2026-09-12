@@ -14,7 +14,7 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 100000
+        total_pages = 300
 
         while True:
             try:
@@ -62,7 +62,7 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
                 logger.info("Moving to next url")
                 i += 1
                 logger.info('the value of I became: %s',i)
-                time.sleep(1.5)
+                time.sleep(1)
 
             else:
                 logger.info("All pages have been successfully processed!")

@@ -18,8 +18,8 @@ def conn_snow(file_path: str , sf_user: str, sf_password: str, sf_account: str, 
                 schema=sf_schema,warehouse=sf_warehouse) as conn:
         with conn.cursor() as cursor:
 
-            cursor.execute(f"USE DATABASE {sf_database};")
-            cursor.execute(f"USE SCHEMA {sf_schema};")
+            cursor.execute(f'USE DATABASE {sf_database};')
+            cursor.execute(f'USE SCHEMA {sf_schema};')
 
             logger.info('creating table...')
             cursor.execute(sql_query)
@@ -30,6 +30,7 @@ def conn_snow(file_path: str , sf_user: str, sf_password: str, sf_account: str, 
             logger.info('putting step...')
             safe_path = Path(file_path).as_posix()
             cursor.execute(f"PUT file://{safe_path} @PENDING_DATA OVERWRITE = TRUE ")
+            logger.info('file successfully updated ...')
 
             logger.info('copping step...')
             cursor.execute("""
@@ -37,5 +38,6 @@ def conn_snow(file_path: str , sf_user: str, sf_password: str, sf_account: str, 
                         FROM @PENDING_DATA/NASA.parquet
                         FILE_FORMAT = (TYPE = PARQUET)
                         MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;""")
+            logger.info('copping step was successfully done...')
 
 
