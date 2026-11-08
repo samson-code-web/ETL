@@ -1,5 +1,12 @@
 import httpx
 from get_api import call_api
+import boto3
+import json
+from botocore.exceptions import ClientError
+import time
+import logging
+
+logger = logging.getLogger(f"etl.{__name__}")
 
 def test_call_api(monkeypatch):
     class MockResponse:
@@ -12,7 +19,7 @@ def test_call_api(monkeypatch):
         "2026-09-18": [
             {
                 "links": {
-                    "self": "http://api.nasa.gov/neo/rest/v1/neo/2260277?api_key=9SQVGfofDZdU8XpN97eLXiU9Vcu0DyTHnNX5YoY3"
+                    "self": "https://api.nasa.gov/neo/rest/v1/feed"
                 },
                 "id": "2260277",
                 "neo_reference_id": "2260277",
@@ -72,9 +79,30 @@ def test_call_api(monkeypatch):
     assert isinstance(value , str)
 
 def test_in_time():
-    key = '9SQVGfofDZdU8XpN97eLXiU9Vcu0DyTHnNX5YoY3'
+    secrets_client = boto3.client('secretsmanager')
+    max_attempts = 10
+    delay_seconds = 3
 
-    parameter = {'api_key': key, 'start_date': '2020-09-04', 'end_date': '2020-09-11'}
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = secrets_client.get_secret_value(SecretId='nasa-api-key')
+            raw_key = json.loads(response['SecretString'])
+            api_key = raw_key.get('api-key', {})
+            logger.info("Secret found for the test! Status is active.")
+            break
+
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+
+            if error_code == 'ResourceNotFoundException':
+                logger.error(f"Retrying in {delay_seconds}s , secret didn't find ...")
+                time.sleep(delay_seconds)
+            else:
+                raise e
+    else:
+        raise TimeoutError("Timed out waiting for the secret to be created.")
+
+    parameter = {'api_key': api_key, 'start_date': '2020-09-04', 'end_date': '2020-09-11'}
 
     response = httpx.get('https://api.nasa.gov/neo/rest/v1/feed',params=parameter)
 

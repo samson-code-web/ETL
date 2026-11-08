@@ -3,6 +3,7 @@ import time
 import logging
 import polars as pl
 from pathlib import Path
+
 logger = logging.getLogger(f"etl.{__name__}")
 
 def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
@@ -13,7 +14,7 @@ def call_api(api_key: str, start_date: str, end_date: str) -> str | None:
 
     with httpx.Client() as client:
         i = 0
-        total_pages = 10
+        total_pages = 3
 
         while True:
             try:
