@@ -72,29 +72,29 @@ def test_call_api(monkeypatch):
     def mock_get_api(*args, **kwargs):
         return MockResponse()
 
-    monkeypatch.setattr(httpx.Client,'get',mock_get_api)
+    monkeypatch.setattr(httpx.Client,"get",mock_get_api)
 
-    value =  call_api('my-fake-api-key','unknown','unknown')
+    value =  call_api("my-fake-api-key","unknown","unknown")
 
     assert isinstance(value , str)
 
 def test_in_time():
-    secrets_client = boto3.client('secretsmanager')
+    secrets_client = boto3.client("secretsmanager")
     max_attempts = 10
     delay_seconds = 3
 
     for attempt in range(1, max_attempts + 1):
         try:
-            response = secrets_client.get_secret_value(SecretId='nasa-api-key')
-            raw_key = json.loads(response['SecretString'])
-            api_key = raw_key.get('api-key', {})
+            response = secrets_client.get_secret_value(SecretId="nasa-api-key")
+            raw_key = json.loads(response["SecretString"])
+            api_key = raw_key.get("api-key", {})
             logger.info("Secret found for the test! Status is active.")
             break
 
         except ClientError as e:
-            error_code = e.response['Error']['Code']
+            error_code = e.response["Error"]["Code"]
 
-            if error_code == 'ResourceNotFoundException':
+            if error_code == "ResourceNotFoundException":
                 logger.error(f"Retrying in {delay_seconds}s , secret didn't find ...")
                 time.sleep(delay_seconds)
             else:
@@ -102,15 +102,15 @@ def test_in_time():
     else:
         raise TimeoutError("Timed out waiting for the secret to be created.")
 
-    parameter = {'api_key': api_key, 'start_date': '2020-09-04', 'end_date': '2020-09-11'}
+    parameter = {"api_key": api_key, "start_date": "2020-09-04", "end_date": "2020-09-11"}
 
-    response = httpx.get('https://api.nasa.gov/neo/rest/v1/feed',params=parameter)
+    response = httpx.get("https://api.nasa.gov/neo/rest/v1/feed",params=parameter)
 
     response.raise_for_status()
 
     data = response.json()
 
-    result = data.get("near_earth_objects",{}).get('2020-09-04',[])[0]
+    result = data.get("near_earth_objects",{}).get("2020-09-04",[])[0]
 
     assert "id" in result
     assert "neo_reference_id" in result
@@ -135,12 +135,12 @@ def test_in_time():
     assert "epoch_date_close_approach" in result.get("close_approach_data",[])[0]
     assert "orbiting_body" in result.get("close_approach_data", [])[0]
 
-    assert "kilometers_per_second" in result.get("close_approach_data",[])[0].get('relative_velocity',{})
-    assert "kilometers_per_hour" in result.get("close_approach_data",[])[0].get('relative_velocity',{})
-    assert "miles_per_hour" in result.get("close_approach_data",[])[0].get('relative_velocity',{})
+    assert "kilometers_per_second" in result.get("close_approach_data",[])[0].get("relative_velocity",{})
+    assert "kilometers_per_hour" in result.get("close_approach_data",[])[0].get("relative_velocity",{})
+    assert "miles_per_hour" in result.get("close_approach_data",[])[0].get("relative_velocity",{})
 
-    assert "astronomical" in result.get("close_approach_data",[])[0].get('miss_distance',{})
-    assert "lunar" in result.get("close_approach_data",[])[0].get('miss_distance',{})
-    assert "kilometers" in result.get("close_approach_data",[])[0].get('miss_distance',{})
-    assert "miles" in result.get("close_approach_data",[])[0].get('miss_distance',{})
+    assert "astronomical" in result.get("close_approach_data",[])[0].get("miss_distance",{})
+    assert "lunar" in result.get("close_approach_data",[])[0].get("miss_distance",{})
+    assert "kilometers" in result.get("close_approach_data",[])[0].get("miss_distance",{})
+    assert "miles" in result.get("close_approach_data",[])[0].get("miss_distance",{})
 

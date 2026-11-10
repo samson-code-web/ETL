@@ -13,11 +13,11 @@ logger.setLevel(logging.INFO)
 logger.propagate = False
 
 if not logger.handlers:
-    file_path = Path(__file__).resolve().parent / 'app.log'
+    file_path = Path(__file__).resolve().parent / "app.log"
 
-    file_handler = logging.FileHandler(str(file_path), mode='a', encoding='utf-8')
+    file_handler = logging.FileHandler(str(file_path), mode="a", encoding="utf-8")
 
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
     file_handler.setFormatter(formatter)
 
@@ -38,7 +38,6 @@ def uploading_to_s3_bucket(file_name , bucket , key):
 @flow(name="launching the pipeline")
 def pipeline(start_date='2020-09-04',
              end_date='2020-09-11',
-             file_name='/home/samson/PycharmProjects/ETL-NASA/NASA.parquet',
              bucket='samson-first-etl-bucket-2026' ,
             key='first/NASA.parquet'):
 
@@ -51,16 +50,16 @@ def pipeline(start_date='2020-09-04',
 
     for attempt in range(1, max_attempts + 1):
         try:
-            response = secrets_client.get_secret_value(SecretId='nasa-api-key')
-            raw_key = json.loads(response['SecretString'])
-            api_key = raw_key.get('api-key', {})
+            response = secrets_client.get_secret_value(SecretId="nasa-api-key")
+            raw_key = json.loads(response["SecretString"])
+            api_key = raw_key.get("api-key", {})
             logger.info("Secret found! Status is active.")
             break
 
         except ClientError as e:
-            error_code = e.response['Error']['Code']
+            error_code = e.response["Error"]["Code"]
 
-            if error_code == 'ResourceNotFoundException':
+            if error_code == "ResourceNotFoundException":
                 print(f"Retrying in {delay_seconds}s...")
                 time.sleep(delay_seconds)
             else:
@@ -70,9 +69,8 @@ def pipeline(start_date='2020-09-04',
 
     logger.info("Proceeding with the pipeline using the secret...")
 
-    extract_task(api_key, start_date, end_date)
-    logger.info('call_api function completed.')
+    file_name = extract_task(api_key, start_date, end_date)
+    logger.info("call_api function completed.")
 
     uploading_to_s3_bucket(file_name= file_name , bucket=bucket , key=key)
-    logger.info('file sent successfully ')
-
+    logger.info("file sent successfully")

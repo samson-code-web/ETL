@@ -1,0 +1,31 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Virtual Environments
+venv/
+.venv/
+ENV/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDEs (PyCharm / VSCode)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific local outputs & logs
+app.log
+*.parquet
